@@ -1,9 +1,22 @@
 // ----------- Functions ------------
 
-let createSenateCell = (content) => {
+let createChamberCell = (content) => {
     let cell = document.createElement("td");
     cell.innerHTML = content;
     return cell;
+}
+
+let createNameCell = (name, url) => {
+    let cell = document.createElement("td");
+    let link = document.createElement("a");
+
+    link.innerHTML = name;
+    link.setAttribute('title', name);
+    link.setAttribute('href', url);
+    link.setAttribute('target', '_blank');
+    cell.append(link);
+    return cell;
+
 }
 
 let createSenateRow = (item) => {
@@ -12,15 +25,20 @@ let createSenateRow = (item) => {
         let fullName = item.first_name + " ";
         fullName += item.middle_name === null ? "" : item.middle_name + " ";
         fullName += item.last_name;
-        newCell = createSenateCell(fullName, tRow);
+        if (item.url.length === 0 || item.url == null) {
+            newCell = createChamberCell(fullName);
+        } else {
+            newCell = createNameCell(fullName, item.url);
+            tRow.setAttribute('data-href', item.url);
+        }
         tRow.append(newCell);
-        newCell = createSenateCell(item.party, tRow); // Party
+        newCell = createChamberCell(item.party); // Party
         tRow.append(newCell);
-        newCell = createSenateCell(item.state, tRow); // State
+        newCell = createChamberCell(item.state); // State
         tRow.append(newCell);
-        newCell = createSenateCell(item.seniority, tRow); // Seniority
+        newCell = createChamberCell(item.seniority); // Seniority
         tRow.append(newCell);
-        newCell = createSenateCell(item.votes_with_party_pct + '%', tRow); // Votes with Party (percentage)
+        newCell = createChamberCell(item.votes_with_party_pct + '%'); // Votes with Party (percentage)
         tRow.append(newCell);
         return tRow;
     }
@@ -29,7 +47,10 @@ let createSenateRow = (item) => {
 console.dir(document.body);
 // console.log(document.body);
 
-const elem = document.getElementById("chamber-data");
+let elem = document.getElementById("chamber-data");
+while (elem === null) {
+    elem = document.getElementById("chamber-data");
+}
 
 if (document.querySelector("body").baseURI.indexOf('index.html') !== -1) {
     elem.innerHTML = JSON.stringify(data, null, 2);
