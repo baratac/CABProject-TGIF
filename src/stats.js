@@ -1,11 +1,6 @@
 // ------------------------
 // Main Variable definition
 
-const gopTab = [];
-const demTab = [];
-const indTab = [];
-const fullTab = [];
-
 // ---------------------
 // Utility Functions
 
@@ -13,9 +8,26 @@ function roundToTwo(num) { // Solution found on Stack Overflow
     return +(Math.round(num + "e+2") + "e-2");
 }
 
-// updateTabs 
+// -------------------------------------
+// Get Party Loyalty Average Percentage
 
-let updateTabs = (fullData) => {
+let getLoyaltyPct = (tab) => {
+
+    if (tab.length === 0) {
+        return 0;
+    }
+    let total = tab.reduce((acc, item) => {
+        return acc + item.votes_with_party_pct;
+    }, 0);
+    return roundToTwo(total / tab.length);
+}
+
+
+let updatePctInfo = (fullData) => {
+    let pctData = [];
+    const gopTab = [];
+    const demTab = [];
+    const indTab = [];
 
     // console.log(data.leng);
     for (let item of fullData) {
@@ -26,8 +38,28 @@ let updateTabs = (fullData) => {
         } else {
             indTab.push(item);
         }
-        fullTab.push(item);
+        // fullTab.push(item);
     }
+    console.log(gopTab.length, gopTab);
+    pctData[0] = {
+        party: 'Republican',
+        number: gopTab.length,
+        avgPct: getLoyaltyPct(gopTab)
+    };
+
+    pctData[1] = {
+        party: 'Democrat',
+        number: demTab.length,
+        avgPct: getLoyaltyPct(demTab)
+    };
+
+    pctData[2] = {
+        party: 'Independent',
+        number: indTab.length,
+        avgPct: getLoyaltyPct(indTab)
+    };
+
+    return pctData;
 }
 
 //----------------------
@@ -77,16 +109,6 @@ let mostLoyal = (item1, item2) => {
 // ----------------------
 // Stats Functions 
 
-let getLoyaltyPct = (tab) => {
-
-    if (tab.length === 0) {
-        return 0;
-    }
-    let total = tab.reduce((acc, item) => {
-        return acc + item.votes_with_party_pct;
-    }, 0);
-    return roundToTwo(total / tab.length);
-}
 
 let getLeastLoyalTen = (tab) => {
     let newTab = [];
@@ -142,33 +164,146 @@ let getMostEngagedTen = (tab) => {
     return newTab;
 }
 
+// -----------------------------------
+// DOM Update Tables Functions
+
+let addCell = (content, tRow) => {
+        let tCell = document.createElement("td");
+
+        tCell.innerHTML = content;
+        tRow.append(tCell);
+    }
+    // GLANCE TABLE
+
+let createGTableRow = (item) => {
+    let tRow = document.createElement("tr");
+
+    addCell(item.party, tRow);
+    addCell(item.number, tRow);
+    addCell(item.avgPct, tRow);
+
+    return tRow;
+}
+
+let createChamberCell = (content) => {
+    let cell = document.createElement("td");
+    cell.innerHTML = content;
+    return cell;
+}
+
+let createNameCell = (name, url) => {
+    let cell = document.createElement("td");
+    let link = document.createElement("a");
+
+    link.innerHTML = name;
+    link.setAttribute('title', name);
+    link.setAttribute('href', url);
+    link.setAttribute('target', '_blank');
+    cell.append(link);
+    return cell;
+
+}
+
+let createLTableRow = (item) => {
+    let tRow = document.createElement("tr");
+    let newCell = Object;
+    let fullName = item.first_name + " ";
+    fullName += item.middle_name === null ? "" : item.middle_name + " ";
+    fullName += item.last_name;
+    if (item.url.length === 0 || item.url == null) {
+        newCell = createChamberCell(fullName);
+    } else {
+        newCell = createNameCell(fullName, item.url);
+        tRow.setAttribute('data-href', item.url);
+    }
+    tRow.append(newCell);
+    newCell = createChamberCell(item.total_votes); // Party
+    tRow.append(newCell);
+    newCell = createChamberCell(item.votes_with_party_pct); // State
+    tRow.append(newCell);
+
+    return tRow;
+}
+
+let createETableRow = (item) => {
+    let tRow = document.createElement("tr");
+    let newCell = Object;
+    let fullName = item.first_name + " ";
+    fullName += item.middle_name === null ? "" : item.middle_name + " ";
+    fullName += item.last_name;
+    if (item.url.length === 0 || item.url == null) {
+        newCell = createChamberCell(fullName);
+    } else {
+        newCell = createNameCell(fullName, item.url);
+        tRow.setAttribute('data-href', item.url);
+    }
+    tRow.append(newCell);
+    newCell = createChamberCell(item.missed_votes); // Party
+    tRow.append(newCell);
+    newCell = createChamberCell(item.missed_votes_pct); // State
+    tRow.append(newCell);
+
+    return tRow;
+}
+
 // ---------------------
 // Main Part
 // ---------------------
 
-updateTabs(data.results[0].members);
+
 
 // console.log('GOP PARTY: ', getLoyaltyPct(gopTab));
 // console.log('DEM PARTY: ', getLoyaltyPct(demTab));
 // console.log('IND PARTY: ', getLoyaltyPct(indTab));
 
-let pctInfo = {
-    'R': getLoyaltyPct(gopTab),
-    'D': getLoyaltyPct(demTab),
-    'I': getLoyaltyPct(indTab)
-};
+const pctInfo = updatePctInfo(data.results[0].members);
+const fullTab = data.results[0].members;
 
 console.log(pctInfo);
 
-let loyaltyInfo = {
-    most: getMostLoyalTen(fullTab.sort(mostLoyal)),
-    least: getLeastLoyalTen(fullTab.sort(leastLoyal))
+console.log('UPDATE DOM');
+
+let elem = document.getElementById("chamber-glance");
+while (elem === null) {
+    elem = document.getElementById("chamber-glance");
+}
+let tBody = elem.querySelector("tbody");
+for (item of pctInfo) {
+    tBody.append(createGTableRow(item));
 };
 
-let engagedInfo = {
-    most: getMostEngagedTen(fullTab.sort(mostEngaged)),
-    least: getLeastEngagedTen(fullTab.sort(leastEngaged))
-};
+if (document.querySelector("body").baseURI.indexOf('loyalty') !== -1) {
+    let loyaltyInfo = {
+        most: getMostLoyalTen(fullTab.sort(mostLoyal)),
+        least: getLeastLoyalTen(fullTab.sort(leastLoyal))
+    };
+    console.log('LOYALTY INFO', loyaltyInfo);
 
-console.log(loyaltyInfo);
-console.log(engagedInfo);
+    elem = document.getElementById("table-least");
+    tBody = elem.querySelector("tbody");
+    for (item of loyaltyInfo.least) {
+        tBody.append(createLTableRow(item));
+    };
+    elem = document.getElementById("table-most");
+    tBody = elem.querySelector("tbody");
+    for (item of loyaltyInfo.most) {
+        tBody.append(createLTableRow(item));
+    };
+} else {
+    let engagedInfo = {
+        most: getMostEngagedTen(fullTab.sort(mostEngaged)),
+        least: getLeastEngagedTen(fullTab.sort(leastEngaged))
+    };
+    console.log('ENGAGED INFO', engagedInfo);
+
+    elem = document.getElementById("table-least");
+    tBody = elem.querySelector("tbody");
+    for (item of engagedInfo.least) {
+        tBody.append(createETableRow(item));
+    };
+    elem = document.getElementById("table-most");
+    tBody = elem.querySelector("tbody");
+    for (item of engagedInfo.most) {
+        tBody.append(createETableRow(item));
+    };
+}
