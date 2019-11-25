@@ -118,7 +118,10 @@ let getLeastLoyalTen = (tab) => {
     // console.log(tenPct, tab.length);
     // console.log('REF LEAST:', refValue, tab[tenPct].votes_with_party_pct);
     newTab = tab.filter((item) => {
-        return item.votes_with_party_pct <= refValue;
+        if (item.total_votes > 0) {
+            return item.votes_with_party_pct <= refValue;
+        }
+        return false;
     });
     return newTab;
 }
@@ -131,7 +134,10 @@ let getMostLoyalTen = (tab) => {
     //    console.log(tenPct, tab.length);
     //    console.log('REF MOST:', refValue, tab[tenPct - 1].votes_with_party_pct);
     newTab = tab.filter((item) => {
-        return item.votes_with_party_pct >= refValue;
+        if (item.total_votes > 0) {
+            return item.votes_with_party_pct >= refValue;
+        }
+        return false;
     });
 
     return newTab;
@@ -145,7 +151,10 @@ let getLeastEngagedTen = (tab) => {
     // console.log(tenPct, tab.length);
     // console.log('REF LEAST:', refValue, tab[tenPct].missed_votes_pct);
     newTab = tab.filter((item) => {
-        return item.missed_votes_pct >= refValue;
+        if (item.total_votes > 0) {
+            return item.missed_votes_pct >= refValue;
+        }
+        return false;
     });
     return newTab;
 }
@@ -158,7 +167,10 @@ let getMostEngagedTen = (tab) => {
     //    console.log(tenPct, tab.length);
     //    console.log('REF MOST:', refValue, tab[tenPct - 1].missed_votes_pct);
     newTab = tab.filter((item) => {
-        return item.missed_votes_pct <= refValue;
+        if (item.total_votes > 0) {
+            return item.missed_votes_pct <= refValue;
+        }
+        return false;
     });
 
     return newTab;
@@ -219,7 +231,7 @@ let createLTableRow = (item) => {
     tRow.append(newCell);
     newCell = createChamberCell(item.total_votes); // Party
     tRow.append(newCell);
-    newCell = createChamberCell(item.votes_with_party_pct); // State
+    newCell = createChamberCell(item.votes_with_party_pct + '%'); // State
     tRow.append(newCell);
 
     return tRow;
@@ -240,7 +252,7 @@ let createETableRow = (item) => {
     tRow.append(newCell);
     newCell = createChamberCell(item.missed_votes); // Party
     tRow.append(newCell);
-    newCell = createChamberCell(item.missed_votes_pct); // State
+    newCell = createChamberCell(item.missed_votes_pct + '%'); // State
     tRow.append(newCell);
 
     return tRow;
