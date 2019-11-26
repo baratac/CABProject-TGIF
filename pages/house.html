@@ -72,6 +72,43 @@
                     <p>Each U.S. state is represented in the House in proportion to its population as measured in the census, but every state is entitled to at least one representative. </p>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-8 d-flex d-flex-row justify-content-start mt-3">
+                    <div class="m-2 px-2">
+                        Filter by Party:
+                    </div>
+                    <div class="form-check-inline">
+                        <label class="form-check-label">
+                                  <input type="checkbox" id="gopSel" class="form-check-input" checked value="">Republican
+                                </label>
+                    </div>
+                    <div class="form-check-inline">
+                        <label class="form-check-label">
+                                  <input type="checkbox" id="demSel" class="form-check-input" checked value="">Democrat
+                                </label>
+                    </div>
+                    <div class="form-check-inline">
+                        <label class="form-check-label">
+                                  <input type="checkbox" id="indSel" class="form-check-input" checked value="">Independent
+                                </label>
+                    </div>
+                </div>
+                <div class="col-4 d-flex d-flex-row justify-content-end mt-3">
+                    <div class="m-2 px-2">
+                        Filter by State:
+                    </div>
+                    <div class="dropdown">
+                        <button type="button" class="btn btn-outline-secondary dropdown-toggle ddbtn" data-toggle="dropdown">
+                                              Dropdown button
+                                            </button>
+                        <div class="dropdown-menu" id="selectState">
+                            <!-- <a class="dropdown-item" href="#">Link 1</a>
+                                        <a class="dropdown-item" href="#">Link 2</a>
+                                        <a class="dropdown-item" href="#">Link 3</a> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
             <table id="chamber-data" class="table table-hover mt-3">
                 <thead>
                     <tr class="bg-primary text-light">
@@ -82,7 +119,7 @@
                         <th>Votes w/Party</th>
                     </tr>
                 </thead>
-                <tbody data-link="row" class="rowlink">
+                <tbody data-link="row" class="rowlink" id="chamber-info">
 
                 </tbody>
             </table>

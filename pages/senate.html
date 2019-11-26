@@ -71,7 +71,45 @@
                             other federal executive officials, military officers, regulatory officials, ambassadors, and other federal uniformed officers, as well as trial of federal officials impeached by the House.</p>
                     </div>
                 </div>
-                <table id="chamber-data" class="table table-striped mt-3">
+                <div class="row">
+                    <div class="col-8 d-flex d-flex-row justify-content-start mt-3">
+                        <div class="m-2 px-2">
+                            Filter by Party:
+                        </div>
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                  <input type="checkbox" id="gopSel" class="form-check-input" checked value="">Republican
+                                </label>
+                        </div>
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                  <input type="checkbox" id="demSel" class="form-check-input" checked value="">Democrat
+                                </label>
+                        </div>
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                  <input type="checkbox" id="indSel" class="form-check-input" checked value="">Independent
+                                </label>
+                        </div>
+                    </div>
+                    <div class="col-4 d-flex d-flex-row justify-content-end mt-3">
+                        <div class="m-2 px-2">
+                            Filter by State:
+                        </div>
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-outline-secondary dropdown-toggle ddbtn" data-toggle="dropdown">
+                                              Dropdown button
+                                            </button>
+                            <div class="dropdown-menu" id="selectState">
+                                <!-- <a class="dropdown-item" href="#">Link 1</a>
+                                        <a class="dropdown-item" href="#">Link 2</a>
+                                        <a class="dropdown-item" href="#">Link 3</a> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <table id="chamber-data" class="table table-striped mt-1">
                     <thead>
                         <tr class="bg-info text-light">
                             <th>Full name</th>
@@ -81,7 +119,7 @@
                             <th>Votes w/Party</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="chamber-info">
 
                     </tbody>
                 </table>
