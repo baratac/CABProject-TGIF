@@ -144,7 +144,7 @@ let stateInitFilter = (statesList) => {
     statesList.sort().unshift('ALL');
 
     let menuElem = document.getElementById("state-select");
-    console.dir(menuElem);
+    // console.dir(menuElem);
     let optElem = Object;
 
     for (let idx = 0; idx < statesList.length; idx++) {
@@ -215,7 +215,7 @@ $(document).ready(function() {
     let observableElem = document.getElementById('state-select');
     observableElem.onchange = function(event) {
         stateUpdateTable(event.currentTarget.value);
-        console.log("B EVENT", event.currentTarget.value);
+        //console.log("B EVENT", event.currentTarget.value);
     };
 
     // Party filters Handler
@@ -245,7 +245,7 @@ $(document).ready(function() {
         console.log('No Content Title found...');
     }
 
-    console.log(contentType);
+    // console.log(contentType);
     // let elem = document.getElementById("chamber-data");
 
     // Handle data for the table
@@ -254,7 +254,8 @@ $(document).ready(function() {
         InitTable(data);
     } else {
         getData('113', contentType).then(data => {
-            console.log(data);
+            //console.log(data);
+            document.getElementById('waiting-flag').style.display = "none";
             InitTable(data);
             //document.getElementById("chamber-data").innerHTML = JSON.stringify(data, null, 2);
         });

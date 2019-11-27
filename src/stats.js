@@ -326,7 +326,8 @@ $(document).ready(function() {
         updatePage(data);
     } else {
         getData('113', contentType).then(data => {
-            console.log(data);
+            document.getElementById('waiting-flag').style.display = "none";
+            //console.log(data);
             updatePage(data);
             //document.getElementById("chamber-data").innerHTML = JSON.stringify(data, null, 2);
         });
