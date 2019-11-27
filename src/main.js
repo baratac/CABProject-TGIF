@@ -1,36 +1,14 @@
 // MAIN Variables
 
 const chamberSelection = { state: 'ALL', party: [] };
+const partyCounter = { R: 0, D: 0, I: 0 };
 
-// ------- DOM utility functions ----
-
-let keepOneOpen = (elem, ref) => {
-    let elements = elem.querySelectorAll('[data-parent="#homeAccordion"]');
-    let foundElem;
-    let i = 0;
-
-    for (let xElem of elements) {
-        // console.log(i + ') ' + xElem.className);
-        if (xElem.className.indexOf('show') !== -1) {
-            foundElem = xElem;
-            break;
-        }
-        if (xElem.className.indexOf('collapsing') !== -1) {
-            foundElem = xElem;
-            break;
-        }
-        i++;
-    }
-    if (foundElem == undefined) {
-        //console.log('All sections all closed', elements);
-        //elements[0].classList.add('show');
-        ref.collapse('show');
-
-    }
-}
-
+let filtersTimer = undefined;
 
 // ----------- Functions ------------
+
+// ----------------------------------
+// Table manipulation Functions
 
 let createChamberCell = (content) => {
     let cell = document.createElement("td");
@@ -75,6 +53,7 @@ let createChamberRow = (item) => {
     return tRow;
 }
 
+// ---------------------------
 // Update Table Functions 
 
 let updateTable = () => {
@@ -104,8 +83,24 @@ let updateTable = () => {
 let stateUpdateTable = (selState) => {
 
     chamberSelection.state = selState;
+    if (selState === 'ALL') {
+        if (chamberSelection.party.length == 0) {
+            if (filtersTimer === undefined) {
+                // console.log('SET TIMER');
+                filtersTimer = setTimeout(function() {
+                    partyInitFilters(partyCounter);
+                    updateTable();
+                    filtersTimer = undefined;
+                }, 1500);
+            }
+        }
+    } else {
+        if (filtersTimer !== undefined) {
+            clearTimeout(filtersTimer);
+            filtersTimer = undefined;
+        }
+    }
     updateTable();
-
 };
 
 let partyUpdateTable = (selList) => {
@@ -124,141 +119,145 @@ let partyUpdateTable = (selList) => {
         selTab.push('I');
     }
     chamberSelection.party = selTab;
+    if (selTab.length == 0 && chamberSelection.state === 'ALL') {
+        if (filtersTimer === undefined) {
+            // console.log('SET TIMER');
+            filtersTimer = setTimeout(function() {
+                partyInitFilters(partyCounter);
+                updateTable();
+                filtersTimer = undefined;
+            }, 1500);
+        }
+    } else {
+        if (filtersTimer !== undefined) {
+            clearTimeout(filtersTimer);
+            filtersTimer = undefined;
+        }
+        updateTable();
+    }
+}
+
+// ---------------------------------
+// Init table and filter Functions
+
+let stateInitFilter = (statesList) => {
+    statesList.sort().unshift('ALL');
+
+    let menuElem = document.getElementById("state-select");
+    console.dir(menuElem);
+    let optElem = Object;
+
+    for (let idx = 0; idx < statesList.length; idx++) {
+        optElem = document.createElement("option");
+        optElem.innerHTML = statesList[idx];
+        optElem.value = statesList[idx];
+        // optElem.href = "#";
+        // optElem.id = "STATE-" + statesList[idx];
+        // optElem.classList.add('dropdown-item');
+        menuElem.append(optElem);
+    };
+}
+
+let partyInitFilters = (partyCount) => {
+    const selTab = [];
+
+    if (partyCount.R > 0) {
+        document.getElementById("gopSel").checked = true;
+        selTab.push('R');
+    } else {
+        document.getElementById("gopSel").checked = false;
+        document.getElementById("gopSel").disabled = true;
+    }
+    if (partyCount.D > 0) {
+        document.getElementById("demSel").checked = true;
+        selTab.push('D');
+    } else {
+        document.getElementById("demSel").checked = false;
+        document.getElementById("demSel").disabled = true;
+    }
+    if (partyCount.I > 0) {
+        document.getElementById("indSel").checked = true;
+        selTab.push('I');
+    } else {
+        document.getElementById("indSel").checked = false;
+        document.getElementById("indSel").disabled = true;
+    }
+    chamberSelection.party = selTab;
+}
+
+let InitTable = (data) => {
+    let statesList = [];
+
+    const tBody = document.querySelector('tbody');
+
+    for (item of data.results[0].members) { // Update Chamber Table
+        if (!statesList.includes(item.state)) { // Update States List
+            statesList.push(item.state);
+        }
+        partyCounter[item.party] = partyCounter[item.party] + 1;
+        tBody.append(createChamberRow(item));
+    };
+    partyInitFilters(partyCounter);
+    stateInitFilter(statesList);
     updateTable();
 }
 
-let partyInitTable = (partyCount) => {
-        const selTab = [];
 
-        if (partyCount.R > 0) {
-            document.getElementById("gopSel").checked = true;
-            selTab.push('R');
-        } else {
-            document.getElementById("gopSel").checked = false;
-            document.getElementById("gopSel").disabled = true;
-        }
-        if (partyCount.D > 0) {
-            document.getElementById("demSel").checked = true;
-            selTab.push('D');
-        } else {
-            document.getElementById("demSel").checked = false;
-            document.getElementById("demSel").disabled = true;
-        }
-        if (partyCount.I > 0) {
-            document.getElementById("indSel").checked = true;
-            selTab.push('I');
-        } else {
-            document.getElementById("indSel").checked = false;
-            document.getElementById("indSel").disabled = true;
-        }
-        chamberSelection.party = selTab;
-        updateTable();
-    }
-    // ----------- Main Part ------------
+// For Senate/House pages -------------
 
 $(document).ready(function() {
-    // console.dir(document.body);
-    // console.log(document.body);
-    let statesList = [];
-    let partyCounter = { R: 0, D: 0, I: 0 };
+
+    // ----------------------------
+    // Filter Events Handlers
+
+    // State Filter Handler
+
+    let observableElem = document.getElementById('state-select');
+    observableElem.onchange = function(event) {
+        stateUpdateTable(event.currentTarget.value);
+        console.log("B EVENT", event.currentTarget.value);
+    };
+
+    // Party filters Handler
+
+    observableElem = document.getElementById('party-select');
+    observableElem.onclick = function(event) {
+        partyUpdateTable(document.querySelectorAll(".form-check-input"));
+    };
+
+    // ----------- Main Part ------------
+
+    // Manage Title/Description area
+
+    elem = document.getElementById("content-title");
+    if (elem != null) {
+        elem.onclick = () => {
+            const imgElem = document.getElementById("content-title-arrow");
+            if (imgElem.currentSrc.indexOf('up.svg') === -1) {
+                imgElem.setAttribute('src', '../resources/icon-arrow-up.svg');
+                imgElem.setAttribute('srcset', '../resources/icon-arrow-up.svg');
+            } else {
+                imgElem.setAttribute('src', '../resources/icon-arrow-down.svg');
+                imgElem.setAttribute('srcset', '../resources/icon-arrow-down.svg');
+            }
+        }
+    } else {
+        console.log('No Content Title found...');
+    }
+
+    console.log(contentType);
+    // let elem = document.getElementById("chamber-data");
+
+    // Handle data for the table
 
     if (typeof data !== 'undefined') { // Only When data is available
-        let elem = document.getElementById("chamber-data");
-
-        if (document.querySelector("body").baseURI.indexOf('index.html') !== -1) {
-            elem.innerHTML = JSON.stringify(data, null, 2);
-        } else {
-            const tBody = elem.querySelector("tbody");
-            for (item of data.results[0].members) { // Update Chamber Table
-                if (!statesList.includes(item.state)) { // Update States List
-                    statesList.push(item.state);
-                }
-                partyCounter[item.party] = partyCounter[item.party] + 1;
-                tBody.append(createChamberRow(item));
-            };
-            //console.log(partyCounter);
-            partyInitTable(partyCounter);
-        }
-
-        // For Senate/House pages -------------
-
-        elem = document.getElementById("content-title");
-        if (elem != null) {
-            elem.onclick = () => {
-                const imgElem = document.getElementById("content-title-arrow");
-                if (imgElem.currentSrc.indexOf('up.svg') === -1) {
-                    imgElem.setAttribute('src', '../resources/icon-arrow-up.svg');
-                    imgElem.setAttribute('srcset', '../resources/icon-arrow-up.svg');
-                } else {
-                    imgElem.setAttribute('src', '../resources/icon-arrow-down.svg');
-                    imgElem.setAttribute('srcset', '../resources/icon-arrow-down.svg');
-                }
-            }
-        } else {
-            console.log('No Content Title found...');
-        }
-        statesList.sort().unshift('ALL');
-        // console.log('SHOW STATES LIST', statesList);
-
-        let menuElem = document.getElementById("selectState");
-        let aElem = Object;
-        for (let idx = 0; idx < statesList.length; idx++) {
-            aElem = document.createElement("a");
-            aElem.innerHTML = statesList[idx];
-            aElem.href = "#";
-            aElem.classList.add('dropdown-item');
-            menuElem.append(aElem);
-        };
-        let menuBtn = document.querySelector(".ddbtn");
-        //console.dir(menuBtn);
-        menuBtn.value = statesList[0];
-        menuBtn.innerHTML = statesList[0];;
-        // Drop Down Click Selection Handler
-
-        $('#selectState a').click(function(event) {
-            // Prevents browser from treating like normal anchor tag
-            event.preventDefault()
-            console.dir($(this));
-            // Retrieves data in anchor tag
-            //let data = $(this).attr('data');
-            let x = this.text;
-            //console.log(x, this);
-            let menuBtn = document.querySelector(".ddbtn");
-            console.dir(menuBtn);
-            menuBtn.value = x;
-            menuBtn.innerHTML = x;
-            //menuBtn.innerText = x;
-            stateUpdateTable(x);
-        });
-
-        $('.form-check-input').click(function(event) {
-
-            console.log('Party Selection activated');
-            let selElem = document.querySelectorAll(".form-check-input");
-            console.dir(selElem);
-            // Retrieves data in anchor tag
-            //let data = $(this).attr('data');
-            //let x = this.text;
-            //console.log(x, this);
-            //menuBtn.innerText = x;
-            partyUpdateTable(selElem);
-        });
+        InitTable(data);
     } else {
-        // For Home Page -----------------------
-
-        elem = document.getElementById('homeAccordion');
-        if (elem != null) {
-            // $("#collapseOne").on("show.bs.collapse", () => console.log('1) show.bs.collapse'));
-            // $("#collapseOne").on("shown.bs.collapse", () => console.log('1) shown.bs.collapse'));
-            // $("#collapseOne").on("hide.bs.collapse", () => console.log('1) hide.bs.collapse'));
-            $("#collapseOne").on("hidden.bs.collapse", () => keepOneOpen(elem, $("#collapseTwo")));
-            // $("#collapseTwo").on("show.bs.collapse", () => console.log('2) show.bs.collapse'));
-            // $("#collapseTwo").on("shown.bs.collapse", () => console.log('2) shown.bs.collapse'));
-            // $("#collapseTwo").on("hide.bs.collapse", () => console.log('2) hide.bs.collapse'));
-            $("#collapseTwo").on("hidden.bs.collapse", () => keepOneOpen(elem, $("#collapseOne")));
-        } else {
-            console.log('--> content1 id not found...');
-        }
+        getData('113', contentType).then(data => {
+            console.log(data);
+            InitTable(data);
+            //document.getElementById("chamber-data").innerHTML = JSON.stringify(data, null, 2);
+        });
     }
 
 });

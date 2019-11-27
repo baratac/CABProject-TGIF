@@ -40,7 +40,7 @@ let updatePctInfo = (fullData) => {
         }
         // fullTab.push(item);
     }
-    console.log(gopTab.length, gopTab);
+    //console.log(gopTab.length, gopTab);
     pctData[0] = {
         party: 'Republican',
         number: gopTab.length,
@@ -258,64 +258,77 @@ let createETableRow = (item) => {
     return tRow;
 }
 
+// Update Page tables
+
+let updatePage = (data) => {
+
+    const pctInfo = updatePctInfo(data.results[0].members);
+    const fullTab = data.results[0].members;
+
+    // console.log(pctInfo);
+    // console.log('UPDATE DOM');
+
+    let elem = document.getElementById("chamber-glance");
+    while (elem === null) {
+        elem = document.getElementById("chamber-glance");
+    }
+    let tBody = elem.querySelector("tbody");
+    for (item of pctInfo) {
+        tBody.append(createGTableRow(item));
+    };
+
+    if (document.querySelector("body").baseURI.indexOf('loyalty') !== -1) {
+        let loyaltyInfo = {
+            most: getMostLoyalTen(fullTab.sort(mostLoyal)),
+            least: getLeastLoyalTen(fullTab.sort(leastLoyal))
+        };
+        // console.log('LOYALTY INFO', loyaltyInfo);
+
+        elem = document.getElementById("table-least");
+        tBody = elem.querySelector("tbody");
+        for (item of loyaltyInfo.least) {
+            tBody.append(createLTableRow(item));
+        };
+        elem = document.getElementById("table-most");
+        tBody = elem.querySelector("tbody");
+        for (item of loyaltyInfo.most) {
+            tBody.append(createLTableRow(item));
+        };
+    } else {
+        let engagedInfo = {
+            most: getMostEngagedTen(fullTab.sort(mostEngaged)),
+            least: getLeastEngagedTen(fullTab.sort(leastEngaged))
+        };
+        console.log('ENGAGED INFO', engagedInfo);
+
+        elem = document.getElementById("table-least");
+        tBody = elem.querySelector("tbody");
+        for (item of engagedInfo.least) {
+            tBody.append(createETableRow(item));
+        };
+        elem = document.getElementById("table-most");
+        tBody = elem.querySelector("tbody");
+        for (item of engagedInfo.most) {
+            tBody.append(createETableRow(item));
+        };
+    }
+
+}
+
+
 // ---------------------
 // Main Part
 // ---------------------
 
+$(document).ready(function() {
 
-
-// console.log('GOP PARTY: ', getLoyaltyPct(gopTab));
-// console.log('DEM PARTY: ', getLoyaltyPct(demTab));
-// console.log('IND PARTY: ', getLoyaltyPct(indTab));
-
-const pctInfo = updatePctInfo(data.results[0].members);
-const fullTab = data.results[0].members;
-
-console.log(pctInfo);
-
-console.log('UPDATE DOM');
-
-let elem = document.getElementById("chamber-glance");
-while (elem === null) {
-    elem = document.getElementById("chamber-glance");
-}
-let tBody = elem.querySelector("tbody");
-for (item of pctInfo) {
-    tBody.append(createGTableRow(item));
-};
-
-if (document.querySelector("body").baseURI.indexOf('loyalty') !== -1) {
-    let loyaltyInfo = {
-        most: getMostLoyalTen(fullTab.sort(mostLoyal)),
-        least: getLeastLoyalTen(fullTab.sort(leastLoyal))
-    };
-    console.log('LOYALTY INFO', loyaltyInfo);
-
-    elem = document.getElementById("table-least");
-    tBody = elem.querySelector("tbody");
-    for (item of loyaltyInfo.least) {
-        tBody.append(createLTableRow(item));
-    };
-    elem = document.getElementById("table-most");
-    tBody = elem.querySelector("tbody");
-    for (item of loyaltyInfo.most) {
-        tBody.append(createLTableRow(item));
-    };
-} else {
-    let engagedInfo = {
-        most: getMostEngagedTen(fullTab.sort(mostEngaged)),
-        least: getLeastEngagedTen(fullTab.sort(leastEngaged))
-    };
-    console.log('ENGAGED INFO', engagedInfo);
-
-    elem = document.getElementById("table-least");
-    tBody = elem.querySelector("tbody");
-    for (item of engagedInfo.least) {
-        tBody.append(createETableRow(item));
-    };
-    elem = document.getElementById("table-most");
-    tBody = elem.querySelector("tbody");
-    for (item of engagedInfo.most) {
-        tBody.append(createETableRow(item));
-    };
-}
+    if (typeof data !== 'undefined') { // Only When data is available
+        updatePage(data);
+    } else {
+        getData('113', contentType).then(data => {
+            console.log(data);
+            updatePage(data);
+            //document.getElementById("chamber-data").innerHTML = JSON.stringify(data, null, 2);
+        });
+    }
+});

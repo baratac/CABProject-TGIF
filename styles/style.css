@@ -17,9 +17,8 @@ footer {
     box-sizing: border-box;
 }
 
-#selectState {
-    max-height: 30vh;
-    overflow: scroll;
+#state-select {
+    max-height: 50vh;
 }
 
 #footerTGIF {
