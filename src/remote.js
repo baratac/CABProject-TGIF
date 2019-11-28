@@ -21,13 +21,14 @@ let getLiveData = () => {
 */
 async function getData(congress, chamber) {
     let refURL = "https://api.propublica.org/congress/v1/CONGRESS/CHAMBER/members.json";
+    const myError = new Error;
 
     refURL = refURL.replace('CONGRESS', congress);
     refURL = refURL.replace('CHAMBER', chamber.toLowerCase());
 
     // console.log('REF URL: ', refURL);
     const reqHeader = new Headers({ "X-API-Key": "JcGFxZvgCSZoxssQaykY0o6pktxjRiIegxN9Uh2V" });
-
+    //const reqHeader = new Headers({ "X-API-Key": "" });
     const myInit = {
         method: 'GET',
         headers: reqHeader,
@@ -35,10 +36,22 @@ async function getData(congress, chamber) {
         cache: 'default'
     };
 
-    //await the response of the fetch call
-    let response = await fetch(refURL, myInit);
-    //proceed once the first promise is resolved.
-    let data = await response.json()
-        //proceed only when the second promise is resolved
-    return data;
+    try {
+        //await the response of the fetch call
+        let response = await fetch(refURL, myInit);
+        // console.log('TEST Response', response);
+        try {
+            // console.log('Get Data');
+            //proceed once the first promise is resolved.
+            let data = await response.json();
+            return data;
+        } catch (error) {
+            myError.message = "No valid data available";
+            throw myError;
+        }
+    } catch (error) {
+        myError.message = "Fetch ProPublica data Failed";
+        //console.log('ERROR!', response);
+        throw myError;
+    }
 }

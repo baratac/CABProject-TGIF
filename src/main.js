@@ -253,12 +253,23 @@ $(document).ready(function() {
     if (typeof data !== 'undefined') { // Only When data is available
         InitTable(data);
     } else {
-        getData('113', contentType).then(data => {
-            //console.log(data);
-            document.getElementById('waiting-flag').style.display = "none";
-            InitTable(data);
-            //document.getElementById("chamber-data").innerHTML = JSON.stringify(data, null, 2);
-        });
+        //contentType = 'xxx';
+        getData('113', contentType).then(
+            data => {
+                document.getElementById('waiting-flag').style.display = "none";
+                //console.log("Promise returns good!!!", data);
+                if (data.status === "OK") {
+                    InitTable(data);
+                } else {
+                    alert("Server Returns Error: " + data.errors);
+                    document.location.href = errorPage;
+                }
+            },
+            error => {
+                document.getElementById('waiting-flag').style.display = "none";
+                alert(error);
+                document.location.href = errorPage;
+            });
     }
 
 });

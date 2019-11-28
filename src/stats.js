@@ -299,7 +299,7 @@ let updatePage = (data) => {
             most: getMostEngagedTen(fullTab.sort(mostEngaged)),
             least: getLeastEngagedTen(fullTab.sort(leastEngaged))
         };
-        console.log('ENGAGED INFO', engagedInfo);
+        //console.log('ENGAGED INFO', engagedInfo);
 
         elem = document.getElementById("table-least");
         tBody = elem.querySelector("tbody");
@@ -325,11 +325,21 @@ $(document).ready(function() {
     if (typeof data !== 'undefined') { // Only When data is available
         updatePage(data);
     } else {
-        getData('113', contentType).then(data => {
-            document.getElementById('waiting-flag').style.display = "none";
-            //console.log(data);
-            updatePage(data);
-            //document.getElementById("chamber-data").innerHTML = JSON.stringify(data, null, 2);
-        });
+        getData('113', contentType).then(
+            data => {
+                document.getElementById('waiting-flag').style.display = "none";
+                //console.log("Promise returns good!!!", data);
+                if (data.status === "OK") {
+                    updatePage(data);
+                } else {
+                    alert("Server Returns Error: " + data.errors);
+                    document.location.href = errorPage;
+                }
+            },
+            error => {
+                document.getElementById('waiting-flag').style.display = "none";
+                alert(error);
+                document.location.href = errorPage;
+            });
     }
 });
