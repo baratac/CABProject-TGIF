@@ -38,6 +38,11 @@ footer {
     max-height: 50vh;
 }
 
+#congress-select {
+    max-width: 6%;
+    background-color: gainsboro;
+}
+
 #footerTGIF {
     height: 56px;
     line-height: 3;

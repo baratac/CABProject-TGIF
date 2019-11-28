@@ -25,14 +25,51 @@ let keepOneOpen = (elem, ref) => {
     }
 }
 
+let congressInitFilter = (selected) => {
+
+
+    let menuElem = document.getElementById("congress-select");
+    // console.dir(menuElem);
+    let optElem = Object;
+
+    for (let idx = 102; idx <= 116; idx++) {
+        optElem = document.createElement("option");
+        optElem.innerHTML = idx;
+        optElem.value = idx;
+        if (idx == selected) {
+            optElem.selected = true;
+        }
+        // optElem.href = "#";
+        // optElem.id = "STATE-" + statesList[idx];
+        // optElem.classList.add('dropdown-item');
+        menuElem.append(optElem);
+    };
+}
 
 // For Home Page -----------------------
-console.log('HOME PAGE');
-elem = document.getElementById('homeAccordion');
-if (elem != null) {
+$(document).ready(function() {
 
-    $("#collapseOne").on("hidden.bs.collapse", () => keepOneOpen(elem, $("#collapseTwo")));
-    $("#collapseTwo").on("hidden.bs.collapse", () => keepOneOpen(elem, $("#collapseOne")));
-} else {
-    console.log('--> content1 id not found...');
-}
+    let observableElem = document.getElementById('congress-select');
+    observableElem.onchange = function(event) {
+        //stateUpdateTable(event.currentTarget.value);
+        console.log("B EVENT", event.currentTarget.value);
+        localStorage.setItem("congress", event.currentTarget.value);
+    };
+
+    console.log('HOME PAGE');
+    elem = document.getElementById('homeAccordion');
+    if (elem != null) {
+
+        $("#collapseOne").on("hidden.bs.collapse", () => keepOneOpen(elem, $("#collapseTwo")));
+        $("#collapseTwo").on("hidden.bs.collapse", () => keepOneOpen(elem, $("#collapseOne")));
+    } else {
+        console.log('--> content1 id not found...');
+    }
+    let congress = localStorage.getItem("congress");
+    if (congress == undefined) {
+        localStorage.setItem("congress", "113");
+        congressInitFilter(113);
+    } else {
+        congressInitFilter(congress);
+    }
+});

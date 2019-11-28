@@ -11,6 +11,11 @@ function roundToTwo(num) { // Solution found on Stack Overflow
 // -------------------------------------
 // Get Party Loyalty Average Percentage
 
+let hasVoted = (item) => {
+
+    return (typeof(item.total_votes) === "number" && item.total_votes > 0);
+}
+
 let getLoyaltyPct = (tab) => {
 
     if (tab.length === 0) {
@@ -31,6 +36,10 @@ let updatePctInfo = (fullData) => {
 
     // console.log(data.leng);
     for (let item of fullData) {
+        if (!hasVoted(item) && typeof(item.votes_with_party_pct) !== "number") {
+            //console.log(item);
+            continue;
+        }
         if (item.party === 'R') {
             gopTab.push(item);
         } else if (item.party === 'D') {
@@ -118,7 +127,7 @@ let getLeastLoyalTen = (tab) => {
     // console.log(tenPct, tab.length);
     // console.log('REF LEAST:', refValue, tab[tenPct].votes_with_party_pct);
     newTab = tab.filter((item) => {
-        if (item.total_votes > 0) {
+        if (hasVoted(item)) {
             return item.votes_with_party_pct <= refValue;
         }
         return false;
@@ -134,7 +143,7 @@ let getMostLoyalTen = (tab) => {
     //    console.log(tenPct, tab.length);
     //    console.log('REF MOST:', refValue, tab[tenPct - 1].votes_with_party_pct);
     newTab = tab.filter((item) => {
-        if (item.total_votes > 0) {
+        if (hasVoted(item)) {
             return item.votes_with_party_pct >= refValue;
         }
         return false;
@@ -151,7 +160,7 @@ let getLeastEngagedTen = (tab) => {
     // console.log(tenPct, tab.length);
     // console.log('REF LEAST:', refValue, tab[tenPct].missed_votes_pct);
     newTab = tab.filter((item) => {
-        if (item.total_votes > 0) {
+        if (hasVoted(item)) {
             return item.missed_votes_pct >= refValue;
         }
         return false;
@@ -167,7 +176,7 @@ let getMostEngagedTen = (tab) => {
     //    console.log(tenPct, tab.length);
     //    console.log('REF MOST:', refValue, tab[tenPct - 1].missed_votes_pct);
     newTab = tab.filter((item) => {
-        if (item.total_votes > 0) {
+        if (hasVoted(item)) {
             return item.missed_votes_pct <= refValue;
         }
         return false;
@@ -325,7 +334,11 @@ $(document).ready(function() {
     if (typeof data !== 'undefined') { // Only When data is available
         updatePage(data);
     } else {
-        getData('113', contentType).then(
+        let congress = localStorage.getItem("congress");
+        console.log("CONGRESS:", congress);
+        document.getElementById('selected-congress').innerHTML = 'Congress ' + congress;
+
+        getData(congress, contentType).then(
             data => {
                 document.getElementById('waiting-flag').style.display = "none";
                 //console.log("Promise returns good!!!", data);
