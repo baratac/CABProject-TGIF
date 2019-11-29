@@ -4,7 +4,7 @@ body {
 }
 
 main {
-    max-height: 70vh;
+    height: 70vh;
     overflow: scroll;
 }
 
@@ -13,9 +13,6 @@ header {
 }
 
 footer {
-    position: fixed;
-    bottom: 5vh;
-    left: 7vw;
     max-height: 10vh;
     box-sizing: border-box;
     opacity: .9;
