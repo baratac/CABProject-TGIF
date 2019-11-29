@@ -251,17 +251,18 @@ $(document).ready(function() {
     // Handle data for the table
 
     let congress = localStorage.getItem("congress");
-    console.log("CONGRESS:", congress);
+    //console.log("CONGRESS:", congress);
     document.getElementById('selected-congress').innerHTML = 'Congress ' + congress;
 
     if (typeof data !== 'undefined') { // Only When data is available
+        document.getElementById('waiting-flag').style.display = "none";
         InitTable(data);
     } else {
         //contentType = 'xxx';
         getData(congress, contentType).then(
             data => {
                 document.getElementById('waiting-flag').style.display = "none";
-                console.log("Promise returns good!!!", data);
+                //console.log("Promise returns good!!!", data);
                 if (data.status === "OK") {
                     InitTable(data);
                 } else {

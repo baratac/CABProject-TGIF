@@ -52,11 +52,11 @@ $(document).ready(function() {
     let observableElem = document.getElementById('congress-select');
     observableElem.onchange = function(event) {
         //stateUpdateTable(event.currentTarget.value);
-        console.log("B EVENT", event.currentTarget.value);
+        //console.log("B EVENT", event.currentTarget.value);
         localStorage.setItem("congress", event.currentTarget.value);
     };
 
-    console.log('HOME PAGE');
+    //console.log('HOME PAGE');
     elem = document.getElementById('homeAccordion');
     if (elem != null) {
 

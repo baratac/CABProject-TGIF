@@ -335,7 +335,7 @@ $(document).ready(function() {
         updatePage(data);
     } else {
         let congress = localStorage.getItem("congress");
-        console.log("CONGRESS:", congress);
+        //console.log("CONGRESS:", congress);
         document.getElementById('selected-congress').innerHTML = 'Congress ' + congress;
 
         getData(congress, contentType).then(

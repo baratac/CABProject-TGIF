@@ -13,8 +13,12 @@ header {
 }
 
 footer {
+    position: fixed;
+    bottom: 5vh;
+    left: 7vw;
     max-height: 10vh;
     box-sizing: border-box;
+    opacity: .9;
 }
 
 .spinner-grow {
@@ -35,7 +39,9 @@ footer {
 }
 
 #state-select {
-    max-height: 50vh;
+    height: 70%;
+    width: 25%;
+    margin-top: .5rem;
 }
 
 #congress-select {
